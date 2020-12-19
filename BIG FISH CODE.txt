@@ -1,0 +1,962 @@
+import pygame
+import random
+import sys
+import winsound
+
+pygame.mixer.init()
+pygame.init()
+
+clock = pygame.time.Clock()
+
+# screen
+screen = pygame.display.set_mode((700, 700))
+icon_surface = pygame.image.load('png/Goldfish.png')
+pygame.display.set_icon(icon_surface)
+pygame.display.set_caption('BIG FISH')
+
+# background
+bg_surface = pygame.image.load('png/background.png').convert_alpha()
+bubble_surface = pygame.image.load('png/bubble.png')
+
+# menu
+menu_screen = pygame.image.load('png/menu_1.png')
+info_screen = pygame.image.load('png/info_screen.png')
+button_info = pygame.image.load('png/button1.png')
+button_play = pygame.image.load('png/button2.png')
+button_back = pygame.image.load('png/button3.png')
+
+button_info_rect = button_info.get_rect()
+button_play_rect = button_play.get_rect()
+button_back_rect = button_back.get_rect()
+
+
+# player
+player1 = pygame.image.load('png/shark40x20px.png').convert_alpha()
+player2 = pygame.image.load('png/shark_80x40px.png').convert_alpha()
+player3 = pygame.image.load('png/shark120x60.png').convert_alpha()
+player4 = pygame.image.load('png/shark160x80.png').convert_alpha()
+
+player1_rect = player1.get_rect()
+
+# FISH ----------------------------
+# big fish
+angler_fish = pygame.image.load('png/angler_fish.png').convert_alpha()
+angler_fish_flipped = pygame.image.load('png/angler_fish_flipped.png').convert_alpha()
+
+angry_boi = pygame.image.load('png/angry_boi.png').convert_alpha()
+angry_boi_flipped = pygame.image.load('png/angry_boi_flipped.png').convert_alpha()
+
+# mega big fish
+octopus_surface = pygame.image.load('png/octopus.png').convert_alpha()
+octopus_surface_flipped = pygame.image.load('png/octopus_flipped.png').convert_alpha()
+
+red_fish = pygame.image.load('png/red_fish.png').convert_alpha()
+red_fish_flipped = pygame.image.load('png/red_fish_flipped.png').convert_alpha()
+
+# small fish
+small_fish = pygame.image.load('png/small_fish2.0.png').convert_alpha()
+small_fish_flipped = pygame.image.load('png/small_fish2.0_flipped.png').convert_alpha()
+
+# green fish
+green_fish = pygame.image.load('png/green_fish.png').convert_alpha()
+green_fish_flipped = pygame.image.load('png/green_fish_flipped.png').convert_alpha()
+
+green_fish2 = pygame.image.load('png/green_fish2.png').convert_alpha()
+green_fish2_flipped = pygame.image.load('png/green_fish2_flipped.png').convert_alpha()
+
+# medium fish
+fish_a = pygame.image.load('png/fish_a.png').convert_alpha()
+fish_a_flipped = pygame.image.load('png/fish_a_flipped.png').convert_alpha()
+
+
+# navel mine
+naval = pygame.image.load('png/naval_mine.png').convert_alpha()
+explosion = pygame.image.load('png/explosion.png')
+
+
+# event timer
+SPAWN_FISH = pygame.USEREVENT
+pygame.time.set_timer(SPAWN_FISH, 1500)
+
+SPAWN_OCTOPUS = pygame.USEREVENT + 1
+pygame.time.set_timer(SPAWN_OCTOPUS, 17777)
+
+SPAWN_OCTOPUS_FLIPPED = pygame.USEREVENT + 2
+pygame.time.set_timer(SPAWN_OCTOPUS_FLIPPED, 30000)
+
+SPAWN_BUBBLE = pygame.USEREVENT + 3
+pygame.time.set_timer(SPAWN_BUBBLE, 3000)
+
+SPAWN_GREEN_FISH = pygame.USEREVENT + 4
+pygame.time.set_timer(SPAWN_GREEN_FISH, 5000)
+
+SPAWN_GREEN_FISH_FLIPPED = pygame.USEREVENT + 5
+pygame.time.set_timer(SPAWN_GREEN_FISH_FLIPPED, 7000)
+
+SPAWN_GREEN_FISH2 = pygame.USEREVENT + 6
+pygame.time.set_timer(SPAWN_GREEN_FISH2, 10000)
+
+SPAWN_GREEN_FISH2_FLIPPED = pygame.USEREVENT + 7
+pygame.time.set_timer(SPAWN_GREEN_FISH2_FLIPPED, 9000)
+
+SPAWN_FISH_A = pygame.USEREVENT + 8
+pygame.time.set_timer(SPAWN_FISH_A, 5000)
+
+SPAWN_FISH_A_FLIPPED = pygame.USEREVENT + 9
+pygame.time.set_timer(SPAWN_FISH_A_FLIPPED, 4000)
+
+SPAWN_ANGLER_FISH = pygame.USEREVENT + 10
+pygame.time.set_timer(SPAWN_ANGLER_FISH, 50000)
+
+SPAWN_ANGLER_FISH_FLIPPED = pygame.USEREVENT + 11
+pygame.time.set_timer(SPAWN_ANGLER_FISH_FLIPPED, 40000)
+
+SPAWN_ANGRY_BOI = pygame.USEREVENT + 12
+pygame.time.set_timer(SPAWN_ANGRY_BOI, 15000)
+
+SPAWN_ANGRY_BOI_FLIPPED = pygame.USEREVENT + 13
+pygame.time.set_timer(SPAWN_ANGRY_BOI_FLIPPED, 20000)
+
+SPAWN_NAVAL = pygame.USEREVENT + 14
+pygame.time.set_timer(SPAWN_NAVAL, 5000)
+
+SPAWN_RED_FISH = pygame.USEREVENT + 15
+pygame.time.set_timer(SPAWN_RED_FISH, 30000)
+
+SPAWN_RED_FISH_FLIPPED = pygame.USEREVENT + 16
+pygame.time.set_timer(SPAWN_RED_FISH_FLIPPED, 35000)
+
+PLAY_BG_MUSIC = pygame.USEREVENT + 17
+pygame.time.set_timer(PLAY_BG_MUSIC, 197000)
+
+# fish lists
+bubble_list = []
+small_fish_list = []
+small_fish_flipped_list = []
+
+green_fish_list = []
+green_fish_flipped_list = []
+green_fish2_list = []
+green_fish2_flipped_list = []
+
+fish_a_list = []
+fish_a_flipped_list = []
+
+octopus_list = []
+octopus_flipped_list = []
+
+angler_fish_list = []
+angler_fish_flipped_list = []
+
+angry_boi_list = []
+angry_boi_flipped_list = []
+
+red_fish_list = []
+red_fish_flipped_list = []
+
+naval_list = []
+
+
+# player fish
+def fish1(x_cor, y_cor, side):
+    global player1_rect
+    screen.blit(side, (x_cor, y_cor))
+    player1_rect.center = (x+.5*player1_rect.w, y+.5*player1_rect.h)   # GEOMETRY POG
+    score_surface = pygame.font.SysFont('arial', 12).render(str(score), True, (34, 255, 34))
+    score_rect = score_surface.get_rect(center=(x+.5*player1_rect.w, y-10))
+    screen.blit(score_surface, score_rect)
+
+
+def player_death():
+    global player1, player1_rect, x, y, score, high_score, menu, game_active
+    if score > high_score:
+        high_score = score
+    octopus_list.clear()
+    small_fish_list.clear()
+    small_fish_flipped_list.clear()
+    octopus_flipped_list.clear()
+    green_fish_list.clear()
+    green_fish_flipped_list.clear()
+    green_fish2_list.clear()
+    green_fish2_flipped_list.clear()
+    fish_a_list.clear()
+    fish_a_flipped_list.clear()
+    angler_fish_list.clear()
+    angler_fish_flipped_list.clear()
+    angry_boi_list.clear()
+    angry_boi_flipped_list.clear()
+    red_fish_list.clear()
+    red_fish_flipped_list.clear()
+    naval_list.clear()
+    player1 = pygame.image.load('png/shark40x20px.png').convert_alpha()
+    player1_rect = player1.get_rect()
+    y = 350
+    x = 330
+    score = 0
+    screen.blit(player1, player1_rect.center)
+
+
+# angry boi AI
+def ai(i):
+    global shark_direction
+    if i.centerx < player1_rect.centerx:
+        i.centerx += angry_boi_speed
+        shark_direction = angry_boi
+    if i.centerx > player1_rect.centerx:
+        shark_direction = angry_boi_flipped
+        i.centerx -= angry_boi_speed
+    if i.centery > player1_rect.centery:
+        i.centery -= angry_boi_speed
+    if i.centery < player1_rect.centery:
+        i.centery += angry_boi_speed
+
+
+# bubbles lmao
+def create__bubbles():
+    random_x_pos = random.choice(x_pos)
+    bubble = bubble_surface.get_rect(center=(random_x_pos, 800))
+    return bubble
+
+
+def move_bubble(bubbles):
+    for i in bubbles:
+        i.centery -= 1
+    return bubbles
+
+
+def draw_bubble(bubbles):
+    for bubble in bubbles:
+        screen.blit(bubble_surface, bubble)
+
+
+# green fish-----------------------------------------------------------------------------------------------------------
+def create_green_fish():
+    random_y_pos = random.choice(fish_y_pos)
+    fish = green_fish.get_rect(center=(-100, random_y_pos))
+    return fish
+
+
+def move_green_fish(list1):
+    for i in list1:
+        i.centerx += green_fish_speed
+    return list1
+
+
+def draw_green_fish(green_fish_list1):
+    for fish in green_fish_list1:
+        screen.blit(green_fish, fish)
+
+
+def check_collision5(green_fish_list1):
+    global score, small_fish_value
+
+    list_index = player1_rect.collidelist(green_fish_list1)
+    if list_index >= 0 and score >= stage2_score:
+        green_fish_list.pop(list_index)
+        score += green_fish_value
+
+
+def create_green_fish_flipped():
+    random_y_pos = random.choice(fish_y_pos)
+    fish = green_fish_flipped.get_rect(center=(800, random_y_pos))
+    return fish
+
+
+def move_green_fish_flipped(list1):
+    for i in list1:
+        i.centerx -= green_fish_speed
+    return list1
+
+
+def draw_green_fish_flipped(green_fish_list1):
+    for fish in green_fish_list1:
+        screen.blit(green_fish_flipped, fish)
+
+
+def check_collision6(green_fish_list1):
+    global score, green_fish_value
+
+    list_index = player1_rect.collidelist(green_fish_list1)
+    if list_index >= 0 and score >= stage2_score:
+        green_fish_flipped_list.pop(list_index)
+        score += green_fish_value
+
+
+# green fish 2
+def create_green_fish2():
+    random_y_pos = random.choice(fish_y_pos)
+    fish = green_fish2.get_rect(center=(-100, random_y_pos))
+    return fish
+
+
+def move_green_fish2(list1):
+    for i in list1:
+        i.centerx += green_fish2_speed
+    return list1
+
+
+def draw_green_fish2(green_fish2_list1):
+    for fish in green_fish2_list1:
+        screen.blit(green_fish2, fish)
+
+
+def check_collision7(green_fish_list1):
+    global score
+
+    list_index = player1_rect.collidelist(green_fish_list1)
+    if list_index >= 0 and score > stage2_score:
+        green_fish2_list.pop(list_index)
+        score += green_fish2_value
+    if list_index >= 0 and score < stage2_score:
+        player_death()
+
+
+def create_green_fish2_flipped():
+    random_y_pos = random.choice(fish_y_pos)
+    fish = green_fish2_flipped.get_rect(center=(800, random_y_pos))
+    return fish
+
+
+def move_green_fish2_flipped(list1):
+    for i in list1:
+        i.centerx -= green_fish2_speed
+    return list1
+
+
+def draw_green_fish2_flipped(green_fish_list1):
+    for fish in green_fish_list1:
+        screen.blit(green_fish2_flipped, fish)
+
+
+def check_collision8(green_fish2_list1):
+    global score
+
+    list_index = player1_rect.collidelist(green_fish2_list1)
+    if list_index >= 0 and score > stage2_score:
+        green_fish2_flipped_list.pop(list_index)
+        score += green_fish2_value
+    if list_index >= 0 and score < stage2_score:
+        player_death()
+
+
+# left side fish spawning ---------------------------------------------
+def create_small_fish():
+    random_y_pos = random.choice(fish_y_pos)
+    fish = small_fish.get_rect(center=(-100, random_y_pos))
+    return fish
+
+
+def move_fish(list1):
+    for i in list1:
+        i.centerx += small_fish_speed
+    return list1
+
+
+def draw_fish(list_small_fish):
+    for fish in list_small_fish:
+        screen.blit(small_fish, fish)
+
+
+def check_collision(fish_list):
+    global score
+
+    list_index = player1_rect.collidelist(fish_list)
+    if list_index >= 0:
+        small_fish_list.pop(list_index)
+        score += small_fish_value
+        winsound.PlaySound('sounds/crunch1', winsound.SND_ASYNC)
+
+
+# small fish right side
+def create_small_fish_right():
+    random_y_pos = random.choice(fish_y_pos)
+    fish = small_fish_flipped.get_rect(center=(800, random_y_pos))
+    return fish
+
+
+def move_fish2(list2):
+    for i in list2:
+        i.centerx -= small_fish_speed
+    return list2
+
+
+def draw_fish2(fish_list):
+    for fish in fish_list:
+        screen.blit(small_fish_flipped, fish)
+
+
+def check_collision2(fish_list):
+    global score
+
+    list_index = player1_rect.collidelist(fish_list)
+    if list_index >= 0:
+        small_fish_flipped_list.pop(list_index)
+        score += small_fish_value
+        winsound.PlaySound('sounds/crunch1', winsound.SND_ASYNC)
+
+
+# fish_a
+def create_fish_a():
+    random_y_pos = random.choice(fish_y_pos)
+    fish = fish_a.get_rect(center=(-100, random_y_pos))
+    return fish
+
+
+def move_fish_a(list1):
+    for i in list1:
+        i.centerx += fish_a_speed
+    return list1
+
+
+def draw_fish_a(list_fish_a):
+    for fish in list_fish_a:
+        screen.blit(fish_a, fish)
+
+
+def check_collision9(fish_list):
+    global score
+
+    list_index = player1_rect.collidelist(fish_list)
+    if list_index >= 0 and score >= stage2_score:
+        fish_a_list.pop(list_index)
+        score += fish_a_value
+    if list_index >= 0 and score < stage2_score:
+        player_death()
+
+
+def create_fish_a_flipped():
+    random_y_pos = random.choice(fish_y_pos)
+    fish = fish_a_flipped.get_rect(center=(800, random_y_pos))
+    return fish
+
+
+def move_fish_a_flipped(list2):
+    for i in list2:
+        i.centerx -= fish_a_speed
+    return list2
+
+
+def draw_fish_a_flipped(fish_list):
+    for fish in fish_list:
+        screen.blit(fish_a_flipped, fish)
+
+
+def check_collision10(fish_list):
+    global score
+
+    list_index = player1_rect.collidelist(fish_list)
+    if list_index >= 0 and score >= stage2_score:
+        fish_a_flipped_list.pop(list_index)
+        score += fish_a_value
+    if list_index >= 0 and score < stage2_score:
+        player_death()
+
+
+# Angler fish
+def create_angler_fish():
+    random_y_pos = random.choice(fish_y_pos)
+    fish = angler_fish.get_rect(center=(-100, random_y_pos))
+    return fish
+
+
+def move_angler_fish(list1):
+    for i in list1:
+        i.centerx += angler_fish_speed
+    return list1
+
+
+def draw_angler_fish(list_angler_fish):
+    for fish in list_angler_fish:
+        screen.blit(angler_fish, fish)
+
+
+def check_collision11(fish_list):
+    global score
+
+    list_index = player1_rect.collidelist(fish_list)
+    if list_index >= 0 and score >= stage3_score:
+        angler_fish_list.pop(list_index)
+        score += angler_fish_value
+    if list_index >= 0 and score < stage3_score:
+        player_death()
+
+
+def create_angler_fish_flipped():
+    random_y_pos = random.choice(fish_y_pos)
+    fish = angler_fish_flipped.get_rect(center=(800, random_y_pos))
+    return fish
+
+
+def move_angler_fish_flipped(list1):
+    for i in list1:
+        i.centerx -= angler_fish_speed
+    return list1
+
+
+def draw_angler_fish_flipped(list_angler_fish):
+    for fish in list_angler_fish:
+        screen.blit(angler_fish_flipped, fish)
+
+
+def check_collision12(fish_list):
+    global score
+
+    list_index = player1_rect.collidelist(fish_list)
+    if list_index >= 0 and score >= stage3_score:
+        angler_fish_flipped_list.pop(list_index)
+        score += angler_fish_value
+    if list_index >= 0 and score < stage3_score:
+        player_death()
+
+
+# angry boi
+def create_angry_boi():
+    random_y_pos = random.choice(fish_y_pos)
+    fish = angry_boi.get_rect(center=(-100, random_y_pos))
+    return fish
+
+
+def move_angry_boi(list1):
+    if score < stage3_score:
+        for i in list1:
+            ai(i)
+    else:
+        if shark_direction == angry_boi_flipped:
+            for i in list1:
+                i.centerx -= 1
+        if shark_direction == angry_boi:
+            for i in list1:
+                i.centerx += 1
+    return list1
+
+
+def draw_angry_boi(angry_boi_list1):
+    for fish in angry_boi_list1:
+        screen.blit(shark_direction, fish)
+
+
+def check_collision13(fish_list):
+    global score
+
+    list_index = player1_rect.collidelist(fish_list)
+    if list_index >= 0 and score >= stage3_score:
+        angry_boi_list.pop(list_index)
+        score += angry_boi_value
+    if list_index >= 0 and score < stage3_score:
+        player_death()
+
+
+def create_angry_boi_flipped():
+    random_y_pos = random.choice(fish_y_pos)
+    fish = angry_boi_flipped.get_rect(center=(800, random_y_pos))
+    return fish
+
+
+def move_angry_boi_flipped(list1):
+    if score < stage3_score:
+        for i in list1:
+            ai(i)
+    else:
+        if shark_direction == angry_boi_flipped:
+            for i in list1:
+                i.centerx -= 1
+        if shark_direction == angry_boi:
+            for i in list1:
+                i.centerx += 1
+    return list1
+
+
+def draw_angry_boi_flipped(angry_boi_list1):
+    for fish in angry_boi_list1:
+        screen.blit(shark_direction, fish)
+
+
+def check_collision14(fish_list):
+    global score
+
+    list_index = player1_rect.collidelist(fish_list)
+    if list_index >= 0 and score >= stage3_score:
+        angry_boi_flipped_list.pop(list_index)
+        score += angry_boi_value
+    if list_index >= 0 and score < stage3_score:
+        player_death()
+
+
+# octopus/size: huge  -----------------------------------------------------
+def create_octopus():
+    random_y_pos = random.choice(fish_y_pos)
+    octopuses = octopus_surface.get_rect(center=(-100, random_y_pos))
+    return octopuses
+
+
+def move_octopus(list3):
+    for i in list3:
+        i.centerx += octopus_speed
+    return list3
+
+
+def draw_octopus(octopuses):
+    for octopus in octopuses:
+        screen.blit(octopus_surface, octopus)
+
+
+def check_collision3(octopus_lists):
+    global score, x, y, stage2_score, stage3_score, stage4_score, player1, player1_rect
+
+    list_index = player1_rect.collidelist(octopus_lists)
+    if list_index >= 0 and score > stage4_score:
+        octopus_lists.pop(list_index)
+        score += octopus_value
+    if list_index >= 0 and score < stage4_score:
+        player_death()
+
+
+# octopus right side spawn ---------------------------------------
+def create_octopus_right():
+    random_y_pos = random.choice(fish_y_pos)
+    octopuses = octopus_surface_flipped.get_rect(center=(800, random_y_pos))
+    return octopuses
+
+
+def move_octopus_flipped(list4):
+    for i in list4:
+        i.centerx -= octopus_speed
+    return list4
+
+
+def draw_octopus_flipped(octopuses):
+    for octopus in octopuses:
+        screen.blit(octopus_surface_flipped, octopus)
+
+
+def check_collision4(octopus_lists):
+    global score, x, y, octopus_value, stage2_score, stage3_score, stage4_score, player1, player1_rect
+
+    list_index = player1_rect.collidelist(octopus_lists)
+    if list_index >= 0 and score > stage4_score:
+        octopus_lists.pop(list_index)
+        score += octopus_value
+    if list_index >= 0 and score < stage4_score:
+        player_death()
+
+
+# red fish
+def create_red_fish():
+    random_y_pos = random.choice(fish_y_pos)
+    fish = red_fish.get_rect(center=(-100, random_y_pos))
+    return fish
+
+
+def move_red_fish(list1):
+    for i in list1:
+        i.centerx += red_fish_speed
+    return list1
+
+
+def draw_red_fish(a):
+    for fish in a:
+        screen.blit(red_fish, fish)
+
+
+def check_collision16(fish_list):
+    global score
+
+    list_index = player1_rect.collidelist(fish_list)
+    if list_index >= 0 and score > stage4_score:
+        red_fish_list.pop(list_index)
+        score += red_fish_value
+    if list_index >= 0 and score < stage4_score:
+        player_death()
+
+
+def create_red_fish_flipped():
+    random_y_pos = random.choice(fish_y_pos)
+    fish = red_fish_flipped.get_rect(center=(800, random_y_pos))
+    return fish
+
+
+def move_red_fish_flipped(list1):
+    for i in list1:
+        i.centerx -= red_fish_speed
+    return list1
+
+
+def draw_red_fish_flipped(a):
+    for fish in a:
+        screen.blit(red_fish_flipped, fish)
+
+
+def check_collision17(fish_list):
+    global score
+
+    list_index = player1_rect.collidelist(fish_list)
+    if list_index >= 0 and score > stage4_score:
+        red_fish_flipped_list.pop(list_index)
+        score += red_fish_value
+    if list_index >= 0 and score < stage4_score:
+        player_death()
+
+
+# naval mines
+def create_naval_mines():
+    random_x_pos = random.choice(x_pos)
+    naval_rect = naval.get_rect(center=(random_x_pos, -1000))
+    return naval_rect
+
+
+def move_naval_mines(list_of_rect):
+    for i in list_of_rect:
+        i.centery += naval_speed
+    return list_of_rect
+
+
+def draw_naval_mines(list_of_rect):
+    for i in list_of_rect:
+        screen.blit(naval, i)
+
+
+def check_collision15(list_of_rect):
+    if player1_rect.collidelist(list_of_rect) >= 0:
+        naval_list.pop(player1_rect.collidelist(list_of_rect))
+        player_death()
+
+# ----------------------------------------------=-----------------------
+
+
+def player_growth():
+    global score, player1_rect, player1, player2, player3, player4
+
+    if score >= stage2_score:
+        player1 = player2
+        player1_rect = player1.get_rect()
+
+    if score >= stage3_score:
+        player1 = player3
+        player1_rect = player1.get_rect()
+
+    if score >= stage4_score:
+        player1 = player4
+        player1_rect = player1.get_rect()
+
+
+# game vars
+x = 330
+y = 350
+delta_x = 0
+delta_y = 0
+fish_y_pos = range(50, 650, 5)
+x_pos = range(5, 695, 5)
+sides = player1
+shark_direction = angry_boi
+
+stage2_score = 50
+stage3_score = 100
+stage4_score = 200
+
+high_score = 0
+
+score = 0
+# fish value
+small_fish_value = 1
+green_fish_value = 2
+green_fish2_value = 4
+angler_fish_value = 7
+red_fish_value = 12
+fish_a_value = 4
+octopus_value = 10
+angry_boi_value = 7
+
+# fish speed (pixel per frame with 60 fps) integer only
+small_fish_speed = 1
+green_fish_speed = 1
+green_fish2_speed = 1
+fish_a_speed = 1
+octopus_speed = 2
+angler_fish_speed = 1
+red_fish_speed = 2
+angry_boi_speed = 1
+naval_speed = 3
+
+# button positions
+button_play_rect.y = 500
+button_play_rect.x = 400
+button_info_rect.y = 500
+button_info_rect.x = 100
+button_back_rect.y = 550
+button_back_rect.x = 440
+
+game_active = False
+menu = True
+info_on = False
+menu_on = True
+
+pygame.mixer.music.load('sounds/Resurrections.mp3')
+pygame.mixer.music.play()
+
+while menu:
+    menu_on = True
+    if menu_on:
+        screen.blit(menu_screen, (0, 0))
+        screen.blit(button_info, button_info_rect)
+        screen.blit(button_play, button_play_rect)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if button_play_rect.collidepoint(pygame.mouse.get_pos()) and event.type == pygame.MOUSEBUTTONDOWN:
+                menu = False
+                game_active = True
+            if button_info_rect.collidepoint(pygame.mouse.get_pos()) and event.type == pygame.MOUSEBUTTONDOWN:
+                info_on = True
+
+    if info_on:
+        menu_on = False
+        screen.blit(info_screen, (0, 0))
+        screen.blit(button_back, button_back_rect)
+        if button_back_rect.collidepoint(pygame.mouse.get_pos()) and event.type == pygame.MOUSEBUTTONDOWN:
+            info_on = False
+            menu = True
+    pygame.display.update()
+
+# winsound.PlaySound('sounds/Arrivederci, Abbacchio', winsound.SND_ASYNC)
+pygame.mixer.music.unload()
+pygame.mixer.music.load('sounds/Arrivederci, Abbacchio.mp3')
+pygame.mixer.music.play()
+
+while game_active:
+    screen.blit(bg_surface, (0, 0))
+    high_score_surface = pygame.font.SysFont('arial', 24).render('HIGH SCORE: ' + str(high_score), True, (255, 255, 34))
+    screen.blit(high_score_surface, (250, 10))
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_a:
+                delta_x = -5
+                sides = player1_flipped
+            if event.key == pygame.K_d:
+                delta_x = 5
+                sides = player1
+            if event.key == pygame.K_w:
+                delta_y = -5
+            if event.key == pygame.K_s:
+                delta_y = 5
+
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_a:
+                delta_x = 0
+            if event.key == pygame.K_d:
+                delta_x = 0
+            if event.key == pygame.K_w:
+                delta_y = 0
+            if event.key == pygame.K_s:
+                delta_y = 0
+
+        if event.type == SPAWN_BUBBLE:
+            bubble_list.append(create__bubbles())
+        if event.type == SPAWN_FISH:
+            small_fish_list.append(create_small_fish())
+            small_fish_flipped_list.append(create_small_fish_right())
+        if event.type == SPAWN_OCTOPUS and score > 75:
+            octopus_list.append(create_octopus())
+        if event.type == SPAWN_OCTOPUS_FLIPPED and score > 75:
+            octopus_flipped_list.append(create_octopus_right())
+        if event.type == SPAWN_GREEN_FISH:
+            green_fish_list.append(create_green_fish())
+        if event.type == SPAWN_GREEN_FISH_FLIPPED:
+            green_fish_flipped_list.append(create_green_fish_flipped())
+        if event.type == SPAWN_GREEN_FISH2:
+            green_fish2_list.append(create_green_fish2())
+        if event.type == SPAWN_GREEN_FISH2_FLIPPED:
+            green_fish2_flipped_list.append(create_green_fish2_flipped())
+        if event.type == SPAWN_FISH_A:
+            fish_a_list.append(create_fish_a())
+        if event.type == SPAWN_FISH_A_FLIPPED:
+            fish_a_flipped_list.append(create_fish_a_flipped())
+        if event.type == SPAWN_ANGLER_FISH:
+            angler_fish_list.append(create_angler_fish())
+        if event.type == SPAWN_ANGLER_FISH_FLIPPED:
+            angler_fish_flipped_list.append(create_angler_fish_flipped())
+        if event.type == SPAWN_ANGRY_BOI and score > 75:
+            angry_boi_list.append(create_angry_boi())
+        if event.type == SPAWN_ANGRY_BOI_FLIPPED and score > 75:
+            angry_boi_flipped_list.append(create_angry_boi_flipped())
+        if event.type == SPAWN_RED_FISH and score > 75:
+            red_fish_list.append(create_red_fish())
+        if event.type == SPAWN_RED_FISH_FLIPPED and score > 75:
+            red_fish_flipped_list.append(create_red_fish_flipped())
+        if event.type == SPAWN_NAVAL:
+            naval_list.append(create_naval_mines())
+
+        if event.type == PLAY_BG_MUSIC:
+            pygame.mixer.music.play()
+
+    # bubbles
+    draw_bubble(move_bubble(bubble_list))
+
+    # naval mines
+    draw_naval_mines(move_naval_mines(naval_list))
+    check_collision15(move_naval_mines(naval_list))
+
+    # small fish
+    draw_fish(move_fish(small_fish_list))
+    check_collision(move_fish(small_fish_list))
+
+    draw_fish2(move_fish2(small_fish_flipped_list))
+    check_collision2(move_fish2(small_fish_flipped_list))
+
+    # green fish
+    draw_green_fish(move_green_fish(green_fish_list))
+    check_collision5(move_green_fish(green_fish_list))
+    draw_green_fish_flipped(move_green_fish_flipped(green_fish_flipped_list))
+    check_collision6(move_green_fish_flipped(green_fish_flipped_list))
+
+    draw_green_fish2(move_green_fish2(green_fish2_list))
+    check_collision7(move_green_fish2(green_fish2_list))
+    draw_green_fish2_flipped(move_green_fish2_flipped(green_fish2_flipped_list))
+    check_collision8(move_green_fish2_flipped(green_fish2_flipped_list))
+
+    # fish_a
+    draw_fish_a(move_fish_a(fish_a_list))
+    draw_fish_a_flipped(move_fish_a_flipped(fish_a_flipped_list))
+    check_collision9(move_fish_a(fish_a_list))
+    check_collision10(move_fish_a_flipped(fish_a_flipped_list))
+
+    # octopus
+    draw_octopus(move_octopus(octopus_list))
+    check_collision3(move_octopus(octopus_list))
+
+    draw_octopus_flipped(move_octopus_flipped(octopus_flipped_list))
+    check_collision4(move_octopus_flipped(octopus_flipped_list))
+
+    # angler fish
+    draw_angler_fish(move_angler_fish(angler_fish_list))
+    draw_angler_fish_flipped(move_angler_fish_flipped(angler_fish_flipped_list))
+
+    check_collision11(move_angler_fish(angler_fish_list))
+    check_collision12(move_angler_fish_flipped(angler_fish_flipped_list))
+
+    # angry boi
+    draw_angry_boi(move_angry_boi(angry_boi_list))
+    draw_angry_boi_flipped(move_angry_boi_flipped(angry_boi_flipped_list))
+
+    check_collision13(move_angry_boi(angry_boi_list))
+    check_collision14(move_angry_boi_flipped(angry_boi_flipped_list))
+
+    # red fish
+    draw_red_fish(move_red_fish(red_fish_list))
+    draw_red_fish_flipped(move_red_fish_flipped(red_fish_flipped_list))
+
+    check_collision16(move_red_fish(red_fish_list))
+    check_collision17(move_red_fish_flipped(red_fish_flipped_list))
+
+    # player mechanics
+    player_growth()
+    player1_flipped = pygame.transform.flip(player1, True, False)
+    fish1(x, y, sides)
+    x += delta_x
+    y += delta_y
+
+    pygame.display.update()
+    clock.tick(60)
